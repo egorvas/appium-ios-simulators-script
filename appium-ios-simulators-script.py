@@ -27,11 +27,13 @@ def start (name: str, device_type: DeviceType , runtime: RunTime,
     runtime = RunTime(identifier=runtime)
     for i in range(threads):
         device = simctl.SimCtl.create_device(name+str(i), device_type, runtime)
+        print("Create simulator with uuid " + device.uuid)
         port = get_free_port()
         generate_node_config_file(device_type, runtime, hub_host, hub_port, port, host)
         appium = ["appium","-p",str(port),
                   "-dc",get_default_capabilities(device.uuid),
                   "--nodeconfig", os.path.abspath(NODE_CONFIG_FILE_NAME)]
+        print("Appium server started for port "+port)
         thread_appium = threading.Thread(target=run_appium_server, args=([TEMP_FOLDER+name+str(i), appium]))
         thread_appium.start()
         time.sleep(delay)
