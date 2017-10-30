@@ -14,6 +14,7 @@ import time
 
 TEMP_FOLDER = "/tmp/"
 NODE_CONFIG_FILE_NAME = "node_config.json"
+LOGS_FOLDER = TEMP_FOLDER+"appium-ios-simulators-script/"
 
 class AppiumDaemon(Daemon):
     def run(self):
@@ -30,9 +31,10 @@ def start (name: str, device_type: DeviceType , runtime: RunTime,
         print("Create simulator with uuid " + device.uuid)
         port = get_free_port()
         generate_node_config_file(device_type, runtime, hub_host, hub_port, port, host)
+        if not os.path.exists(LOGS_FOLDER): os.makedirs(LOGS_FOLDER)
         appium = ["appium","-p",str(port),
                   "-dc",get_default_capabilities(device.uuid),
-                  "--nodeconfig", os.path.abspath(NODE_CONFIG_FILE_NAME)]
+                  "--nodeconfig", os.path.abspath(NODE_CONFIG_FILE_NAME), "--log", LOGS_FOLDER+name+str(i)+".log"]
         print("Appium server started for port "+str(port))
         thread_appium = threading.Thread(target=run_appium_server, args=([TEMP_FOLDER+name+str(i), appium]))
         thread_appium.start()
